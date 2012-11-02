@@ -1,5 +1,6 @@
 $(->
   geocode('10001')
+  #jump('40.76026190,-73.99328720')
   #query(geocode('10552'))
 )
 
@@ -17,6 +18,31 @@ geocode = (address)->
       lng = location.lng
       coords = "#{lat},#{lng}"
       query(coords)
+  })
+
+# if you get the viewport for this coord's square dimensions,
+# move to an adjacent square
+jump = (coords)->
+  $.ajax({
+    url: "./geocode_request.php?address=#{coords}",
+    type: 'GET',
+    success: (data)->
+      request_results = JSON.parse(data).results[0]
+      viewport = request_results.geometry.viewport
+
+      # calculate the width and height of the zip-code viewport
+      width = viewport.northeast.lng - viewport.southwest.lng
+      height = viewport.northeast.lat - viewport.southwest.lat
+
+      # get a random adjacent zip-code sized square
+      matrix = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]
+      index = Math.floor(Math.random() * matrix.length)
+
+      multiplier = 7
+      new_lat = request_results.geometry.location.lat + matrix[index][1] * height * multiplier
+      new_lng = request_results.geometry.location.lng + matrix[index][0] * width * multiplier
+
+      query("#{new_lat},#{new_lng}")
   })
 
 query = (coords, radius = 20000, next_page = false)->
@@ -55,8 +81,14 @@ query = (coords, radius = 20000, next_page = false)->
           _.delay(->
             query(coords, radius, response.next_page_token)
           3000)
+
+        # otherwise, jump!
+        else
+          console.log "looks like we're out of pages, so let's jump to an adjacent area"
+          jump(coords)
       else
-        console.log 'no addresses found in this search :('
+        console.log "no addresses found in this search, so let's jump to an adjacent area"
+        jump(coords)
   })
 
 # given an array of address results, see if any of the street numbers
@@ -75,3 +107,7 @@ parseResults = (request_results)->
 
   console.log "current results:", results
   console.log "but we're still looking for #{desired}"
+
+  if desired.length == 0
+    console.log 'oh shit, we found them all!'
+    return false
