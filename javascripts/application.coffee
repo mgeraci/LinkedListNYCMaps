@@ -11,14 +11,18 @@ geocode = (address)->
       location = JSON.parse(data).results[0].geometry.location
       lat = location.lat
       lng = location.lng
-      console.log lat, lng
+      coords = "#{lat},#{lng}"
+      query(coords)
   })
 
 
-query = ->
+query = (coords)->
   $.ajax({
-    url: "./request.php?location=-33.8670522,151.1957362&radius=500&types=food&name=starbucks",
+    url: "./request.php?location=#{coords}&radius=5000&types=food&name=starbucks",
     type: 'GET',
     success: (data)->
-      console.log data
+      results = JSON.parse(data).results
+      results = _.map results, (result)->
+        result.vicinity.match(/^\d+/)?[0]
+      console.log results
   })

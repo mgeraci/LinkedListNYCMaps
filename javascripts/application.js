@@ -11,21 +11,28 @@
       url: "./geocode_request.php?address=" + address,
       type: 'GET',
       success: function(data) {
-        var lat, lng, location;
+        var coords, lat, lng, location;
         location = JSON.parse(data).results[0].geometry.location;
         lat = location.lat;
         lng = location.lng;
-        return console.log(lat, lng);
+        coords = "" + lat + "," + lng;
+        return query(coords);
       }
     });
   };
 
-  query = function() {
+  query = function(coords) {
     return $.ajax({
-      url: "./request.php?location=-33.8670522,151.1957362&radius=500&types=food&name=starbucks",
+      url: "./request.php?location=" + coords + "&radius=5000&types=food&name=starbucks",
       type: 'GET',
       success: function(data) {
-        return console.log(data);
+        var results;
+        results = JSON.parse(data).results;
+        results = _.map(results, function(result) {
+          var _ref;
+          return (_ref = result.vicinity.match(/^\d+/)) != null ? _ref[0] : void 0;
+        });
+        return console.log(results);
       }
     });
   };
