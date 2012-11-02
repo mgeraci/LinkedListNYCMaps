@@ -3,6 +3,8 @@ $(->
   #query()
 )
 
+desired = [114,151,156,153,145,144,114,151,163,164,116,131,103]
+
 geocode = (address)->
   $.ajax({
     url: "./geocode_request.php?address=#{address}",
