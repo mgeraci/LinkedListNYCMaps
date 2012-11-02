@@ -4,5 +4,7 @@
   $radius = $_GET['radius'];
   $types = $_GET['types'];
   $name = $_GET['name'];
-  echo file_get_contents("https://maps.googleapis.com/maps/api/place/search/json?location=$location&radius=$radius&types=$types&name=$name&sensor=false&key=$key");
+  $pagetoken = $_GET['next_page'];
+  $url = "https://maps.googleapis.com/maps/api/place/search/json?location=$location&radius=$radius&types=$types&name=$name&sensor=false&key=$key&pagetoken=$pagetoken";
+  echo file_get_contents($url);
 ?>
