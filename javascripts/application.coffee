@@ -1,10 +1,7 @@
 $(->
   geocode('10001')
-  #jump('40.76026190,-73.99328720')
-  #query(geocode('10552'))
 )
 
-desired = [114,151,156,153,145,144,114,151,163,164,116,131,103]
 desired = [76,105,110,107,101,100,76,105,115,116,78,89,67]
 results = []
 
@@ -45,6 +42,9 @@ jump = (coords)->
       query("#{new_lat},#{new_lng}")
   })
 
+# make a query to the places api, and trigger the next step. either:
+# - starting a query for the next page
+# - moving to an adjacent area to jump
 query = (coords, radius = 20000, next_page = false)->
   console.log "starting a #{'next page ' if next_page?}query within #{radius}m of '#{coords}'"
 
